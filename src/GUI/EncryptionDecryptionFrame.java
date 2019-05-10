@@ -1,38 +1,46 @@
 package GUI;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import IDEA.Key;
-import IO.FilterTheFiles;
-import IO.IOutils;
-import IDEA.Convert;
-import IDEA.IDEA;
-import AES.AES;
-import BlowFish.BlowFishEnc;
-import Details.DetailsMethods;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
+
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JTextArea;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+
+import AES.AES;
+import BlowFish.BlowFishEnc;
+import Details.DetailsMethods;
+import IDEA.Convert;
+import IDEA.IDEA;
+import IDEA.Key;
+import IO.FilterTheFiles;
+import IO.IOutils;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 public class EncryptionDecryptionFrame extends JFrame {
-	private static final long serialVersionUID = 1L;
+	static String e="";
 	private JPanel contentPane;
+	private static final long serialVersionUID = 1L;
 	private static JTextField textFieldKeyPath;
 	private static JTextField textFieldForText;
 	JButton btnGenerateKeys;
@@ -54,11 +62,20 @@ public class EncryptionDecryptionFrame extends JFrame {
 	static JRadioButton textInputRadioButtonForText;
 	static JRadioButton fileInputRadioButtonForText;
 	static JTextArea textAreaResults;
-	java.awt.Font font = new java.awt.Font("Arial Unicode MS", java.awt.Font.PLAIN, 18); 
+
 	/**
 	 * Launch the application.
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		 e= BlowFishEnc.encryptBlowfish("textToEncrypt", "anyKey");
+		//writing
+		IOutils.writeAfile("D:\\output.txt", e);
+		//reading
+		String result=IOutils.readAfile("D:\\output.txt");
+		System.out.println("result: "+result);
+		String ee=BlowFishEnc.decryptBlowfish(result, "anyKey");
+		System.out.println(ee);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -365,7 +382,6 @@ public class EncryptionDecryptionFrame extends JFrame {
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new Options().setVisible(true);
-				close();
 			}
 		});
 		contentPane.add(btnBack);
@@ -382,19 +398,29 @@ public class EncryptionDecryptionFrame extends JFrame {
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new EncryptionDecryptionFrame().setVisible(true);
-				close();
 			}
 		});
 		contentPane.add(btnReset);
-		
-	
+		 textAreaResults = new JTextArea();
+		 GraphicsEnvironment.getLocalGraphicsEnvironment();
+		    Font font = new Font("DejavuSans", Font.PLAIN, 40);
+		 textAreaResults.setBackground(color);
+		 textAreaResults.setForeground(Color.LIGHT_GRAY);
+		 textAreaResults.setFont(font);
+		textAreaResults.setLineWrap(true);
+		textAreaResults.setWrapStyleWord(true);
+		textAreaResults.setText(e);
+		contentPane.add(textAreaResults);
+		JScrollPane sPane=new JScrollPane(textAreaResults,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		sPane.setBounds(478, 38, 506, 412);
+		contentPane.add(sPane);
 		btnGenerateKeys.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (encryptionRadioButton.isSelected() & aesRadioButton.isSelected()
 						& textInputRadioButton.isSelected()) {
 					try {
 						choosingTextInputForAesKey();
-					} catch (UnsupportedEncodingException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -402,7 +428,7 @@ public class EncryptionDecryptionFrame extends JFrame {
 						& fileInputRadioButton.isSelected()) {
 					try {
 						choosingFileInputForAesKey();
-					} catch (UnsupportedEncodingException e) {
+					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
@@ -414,10 +440,20 @@ public class EncryptionDecryptionFrame extends JFrame {
 					choosingFileInputForBlowFishKey();
 				} else if (encryptionRadioButton.isSelected() & ideaRadioButton.isSelected()
 						& textInputRadioButton.isSelected()) {
-					choosingTextInputForIdeaKey();
+					try {
+						choosingTextInputForIdeaKey();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else if (encryptionRadioButton.isSelected() & ideaRadioButton.isSelected()
 						& fileInputRadioButton.isSelected()) {
-					choosingFileInputForIdeaKey();
+					try {
+						choosingFileInputForIdeaKey();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		});
@@ -426,14 +462,20 @@ public class EncryptionDecryptionFrame extends JFrame {
 				//AES
 				if (encryptionRadioButton.isSelected() & aesRadioButton.isSelected()
 						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
-					try {
-						if(textInputRadioButtonForText.isSelected())
-						choosingTextInputForAesEncryption();
-						else if (fileInputRadioButtonForText.isSelected()) 
-						choosingFileInputForAesEncryption();
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
+					if(textInputRadioButtonForText.isSelected())
+						try {
+							choosingTextInputForAesEncryption();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForAesEncryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				}
 				//BlowFish
 				if (encryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
@@ -441,20 +483,35 @@ public class EncryptionDecryptionFrame extends JFrame {
 					if(textInputRadioButtonForText.isSelected())
 						try {
 							choosingTextInputForBlowfishEncryption();
-						} catch (UnsupportedEncodingException e) {
+						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					else if (fileInputRadioButtonForText.isSelected()) 
-					choosingFileInputForBlowfishEncryption();
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForBlowfishEncryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				}
 				//Idea
 				if (encryptionRadioButton.isSelected() & ideaRadioButton.isSelected()
 						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
 					if(textInputRadioButtonForText.isSelected())
-						choosingTextInputForIdeaEncryption();
-					else if (fileInputRadioButtonForText.isSelected()) 
-					choosingFileInputForIdeaEncryption();
+						try {
+							choosingTextInputForIdeaEncryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForIdeaEncryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				}
 			}
 		});
@@ -462,28 +519,13 @@ public class EncryptionDecryptionFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					getDetails();
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(946, 30, -477, 420);
-		contentPane.add(scrollPane);
-		
-		 textAreaResults = new JTextArea();
-		 textAreaResults.setBackground(color);
-		 textAreaResults.setForeground(Color.LIGHT_GRAY);
-		 textAreaResults.setFont(new Font("Courier New", Font.PLAIN, 15));
-		textAreaResults.setLineWrap(true);
-		textAreaResults.setWrapStyleWord(true);
-		contentPane.add(textAreaResults);
-		JScrollPane sPane=new JScrollPane(textAreaResults,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		sPane.setBounds(478, 38, 506, 412);
-		contentPane.add(sPane);
 	}
-public static void getDetails() throws UnsupportedEncodingException {
+public static void getDetails() throws IOException {
 	String details="";
 	if (chckbxAsciiKey.isSelected() & (textInputRadioButton.isSelected() || fileInputRadioButton.isSelected())) {
 		if(textInputRadioButton.isSelected())
@@ -588,7 +630,7 @@ public static void getDetails() throws UnsupportedEncodingException {
 	textAreaResults.setText(details);
 	IOutils.writeAfile("D:\\details.txt", details);
 }
-public static  void choosingFileInputForIdeaEncryption() {
+public static  void choosingFileInputForIdeaEncryption() throws IOException {
 	String text=IOutils.readAfile(textFieldForText.getText());
 	String key="";
 	if (textInputRadioButton.isSelected()) {
@@ -604,7 +646,7 @@ public static  void choosingFileInputForIdeaEncryption() {
 	}
 	}
 
-public static void choosingTextInputForIdeaEncryption() {
+public static void choosingTextInputForIdeaEncryption() throws IOException {
 	String text=textAreaForText.getText();
 	String key="";
 	if (textInputRadioButton.isSelected()) {
@@ -620,7 +662,7 @@ public static void choosingTextInputForIdeaEncryption() {
 	}
 	}
 
-public static void choosingFileInputForBlowfishEncryption() {
+public static void choosingFileInputForBlowfishEncryption() throws IOException {
 	String text=IOutils.readAfile(textFieldForText.getText());
 	String key="";
 	if (textInputRadioButton.isSelected()) {
@@ -639,13 +681,19 @@ public static void choosingFileInputForBlowfishEncryption() {
 	}
 	}
 
-public static void choosingTextInputForBlowfishEncryption() throws UnsupportedEncodingException {
+public static void choosingTextInputForBlowfishEncryption() throws IOException {
 	String text=textAreaForText.getText();
 	String key="";
 	if (textInputRadioButton.isSelected()) {
 		key=textAreaForKey.getText();
 		String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
+		byte[] arr=resultingCipher.getBytes("UTF-8");
+		for (byte x:arr) {
+			System.out.println(x);
+		}
 		System.out.println(resultingCipher);
+		String s=new String(arr, "UTF-8");
+		System.out.println(s);
 		textAreaResults.setText(resultingCipher);
 		IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
 		System.out.println(resultingCipher);
@@ -659,7 +707,7 @@ public static void choosingTextInputForBlowfishEncryption() throws UnsupportedEn
 	}
 	}
 
-public static void choosingTextInputForAesEncryption() throws UnsupportedEncodingException {
+public static void choosingTextInputForAesEncryption() throws IOException {
 	String text=textAreaForText.getText();
 	String key="";
 	if (textInputRadioButton.isSelected()) {
@@ -674,7 +722,7 @@ public static void choosingTextInputForAesEncryption() throws UnsupportedEncodin
 		textAreaResults.setText(resultingCipher);
 	}
 }
-public static void choosingFileInputForAesEncryption() throws UnsupportedEncodingException {
+public static void choosingFileInputForAesEncryption() throws IOException {
 	String text=IOutils.readAfile(textFieldForText.getText());
 	String key="";
 	if (textInputRadioButton.isSelected()) {
@@ -689,12 +737,12 @@ public static void choosingFileInputForAesEncryption() throws UnsupportedEncodin
 		textAreaResults.setText(resultingCipher);
 	}
 }
-	public static void choosingTextInputForAesKey() throws UnsupportedEncodingException {
+	public static void choosingTextInputForAesKey() throws IOException {
 		textAreaResults.setText(AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));
 		IOutils.writeAfile("D:\\aesKeys.txt", AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));
 	}
 
-	public static void choosingFileInputForAesKey() throws UnsupportedEncodingException {
+	public static void choosingFileInputForAesKey() throws IOException {
 		// The name of the file to open.
 		String fileName = textFieldKeyPath.getText();
 		String key = IOutils.readAfile(fileName);
@@ -718,7 +766,7 @@ public static void choosingFileInputForAesEncryption() throws UnsupportedEncodin
 		IOutils.writeAfile("D:\\blowfishkey.txt", blowFishEnc.getKey(key));
 	}
 
-	public static void choosingFileInputForIdeaKey() {
+	public static void choosingFileInputForIdeaKey() throws IOException {
 		String fileName = textFieldKeyPath.getText();
 		String key = IOutils.readAfile(fileName);
 		Key k = new Key(key);
@@ -726,7 +774,7 @@ public static void choosingFileInputForAesEncryption() throws UnsupportedEncodin
 		IOutils.writeAfile("D:\\ideaKeys.txt", k.getEncKeys());
 	}
 
-	public static void choosingTextInputForIdeaKey() {
+	public static void choosingTextInputForIdeaKey() throws IOException {
 		String string = textAreaForKey.getText();
 		String keys = "";
 		Key key = new Key(string);

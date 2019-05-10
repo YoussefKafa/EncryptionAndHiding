@@ -1,14 +1,19 @@
 package BlowFish;
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 public class BlowFishMainMethod {
 	public static void main(String[] args) throws Exception {
-		String e = BlowFishEnc.encryptBlowfish("fdakfldasjds", "dsflkajsd;fasd");
+		String e = BlowFishEnc.encryptBlowfish("hello", "anykey");
 		System.out.println(e);
-		String ee = BlowFishEnc.decryptBlowfish(e, "dsflkajsd;fasd");
-		System.out.println(ee);
-		PrintWriter writer = new PrintWriter("D:/results.txt", "UTF-8");
-		writer.println(e);
-		writer.close();
+		byte[] arr=e.getBytes("UTF-8");
+		for (byte x:arr) {
+			System.out.println(x);
+		}
+		System.out.println(Arrays.toString(arr));
+		String s=new String(arr, "UTF-8");
+	    System.out.println(e);
+	    String decode=BlowFishEnc.decryptBlowfish(s,"anykey");
+	    System.out.println(decode);
 	}
 }
