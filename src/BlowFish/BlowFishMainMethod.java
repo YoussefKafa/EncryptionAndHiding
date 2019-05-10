@@ -1,6 +1,4 @@
 package BlowFish;
-
-import java.io.PrintWriter;
 import java.util.Arrays;
 public class BlowFishMainMethod {
 	public static void main(String[] args) throws Exception {

@@ -1,21 +1,7 @@
 package BlowFish;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.Charset;
 import java.util.Base64;
-import java.util.Scanner;
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import IO.IOutils;
 public class BlowFishEnc {
 	public String getKey(String strkey) {
 		//create a key
@@ -56,14 +42,14 @@ public class BlowFishEnc {
 		  } catch (Exception e) { return null; }
 		}
   public static void main(String[] args) throws Exception {
-	String e= BlowFishEnc.encryptBlowfish("textToEncrypt", "anyKey");
+	/*String e= BlowFishEnc.encryptBlowfish("textToEncrypt", "anyKey");
 	//writing
 	IOutils.writeAfile("D:\\output.txt", e);
 	//reading
 	String result=IOutils.readAfile("D:\\output.txt");
 	System.out.println("result: "+result);
 	String ee=BlowFishEnc.decryptBlowfish(result, "anyKey");
-	System.out.println(ee);
+	System.out.println(ee);*/
 	
   }
 }
