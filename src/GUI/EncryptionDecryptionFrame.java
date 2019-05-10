@@ -68,14 +68,7 @@ public class EncryptionDecryptionFrame extends JFrame {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		 e= BlowFishEnc.encryptBlowfish("textToEncrypt", "anyKey");
-		//writing
-		IOutils.writeAfile("D:\\output.txt", e);
-		//reading
-		String result=IOutils.readAfile("D:\\output.txt");
-		System.out.println("result: "+result);
-		String ee=BlowFishEnc.decryptBlowfish(result, "anyKey");
-		System.out.println(ee);
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -403,7 +396,7 @@ public class EncryptionDecryptionFrame extends JFrame {
 		contentPane.add(btnReset);
 		 textAreaResults = new JTextArea();
 		 GraphicsEnvironment.getLocalGraphicsEnvironment();
-		    Font font = new Font("DejavuSans", Font.PLAIN, 40);
+		    Font font = new Font("DejavuSans", Font.BOLD, 20);
 		 textAreaResults.setBackground(color);
 		 textAreaResults.setForeground(Color.LIGHT_GRAY);
 		 textAreaResults.setFont(font);
@@ -434,10 +427,20 @@ public class EncryptionDecryptionFrame extends JFrame {
 					}
 				} else if (encryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
 						& textInputRadioButton.isSelected()) {
-					choosingTextInputForBlowFishKey();
+					try {
+						choosingTextInputForBlowFishKey();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else if (encryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
 						& fileInputRadioButton.isSelected()) {
-					choosingFileInputForBlowFishKey();
+					try {
+						choosingFileInputForBlowFishKey();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				} else if (encryptionRadioButton.isSelected() & ideaRadioButton.isSelected()
 						& textInputRadioButton.isSelected()) {
 					try {
@@ -682,29 +685,12 @@ public static void choosingFileInputForBlowfishEncryption() throws IOException {
 	}
 
 public static void choosingTextInputForBlowfishEncryption() throws IOException {
-	String text=textAreaForText.getText();
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=textAreaForKey.getText();
-		String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
-		byte[] arr=resultingCipher.getBytes("UTF-8");
-		for (byte x:arr) {
-			System.out.println(x);
-		}
-		System.out.println(resultingCipher);
-		String s=new String(arr, "UTF-8");
-		System.out.println(s);
-		textAreaResults.setText(resultingCipher);
-		IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
-		System.out.println(resultingCipher);
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file
-		key=IOutils.readAfile(textFieldKeyPath.getText());
-		String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
-		textAreaResults.setText(resultingCipher);
-		IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
-	}
+	String e= BlowFishEnc.encryptBlowfish(textAreaForText.getText(), textAreaForKey.getText());
+	//writing
+	IOutils.writeAfile("D:\\blowfishCipher.txt", e);
+	//reading
+	String result=IOutils.readAfile("D:\\blowfishCipher.txt");
+	textAreaResults.setText(result);
 	}
 
 public static void choosingTextInputForAesEncryption() throws IOException {
@@ -751,14 +737,14 @@ public static void choosingFileInputForAesEncryption() throws IOException {
 	}
 
 	
-	public static void choosingTextInputForBlowFishKey() {
+	public static void choosingTextInputForBlowFishKey() throws IOException {
 		BlowFishEnc blowFishEnc = new BlowFishEnc();
 		String string = textAreaForKey.getText();
 		textAreaResults.setText(blowFishEnc.getKey(string));
 		IOutils.writeAfile("D:\\blowfishKey.txt", blowFishEnc.getKey(string));
 	}
 
-	public static void choosingFileInputForBlowFishKey() {
+	public static void choosingFileInputForBlowFishKey() throws IOException {
 		BlowFishEnc blowFishEnc = new BlowFishEnc();
 		String fileName = textFieldKeyPath.getText();
 		String key = IOutils.readAfile(fileName);

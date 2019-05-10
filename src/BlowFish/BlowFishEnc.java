@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.Scanner;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -16,6 +17,19 @@ import javax.crypto.spec.SecretKeySpec;
 
 import IO.IOutils;
 public class BlowFishEnc {
+	public String getKey(String strkey) {
+		//create a key
+		SecretKeySpec key = new SecretKeySpec(strkey.getBytes(), "Blowfish");
+		 /* Get key in encoding format */
+		  byte encoded[] = key.getEncoded();
+
+		  /*
+		   * Encodes the specified byte array into a String using Base64 encoding
+		   * scheme
+		   */
+		  String encodedKey = Base64.getEncoder().encodeToString(encoded);
+		 return encodedKey;
+	}
 	public static String encryptBlowfish(String to_encrypt, String strkey) {
 		  try {
 //create a key
