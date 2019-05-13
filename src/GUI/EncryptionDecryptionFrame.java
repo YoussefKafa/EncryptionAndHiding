@@ -7,6 +7,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -22,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-
 import AES.AES;
 import BlowFish.BlowFishEnc;
 import Details.DetailsMethods;
@@ -59,7 +59,6 @@ public class EncryptionDecryptionFrame extends JFrame {
 	static JRadioButton textInputRadioButtonForText;
 	static JRadioButton fileInputRadioButtonForText;
 	static JTextArea textAreaResults;
-
 	/**
 	 * Launch the application.
 	 * @throws IOException 
@@ -406,6 +405,18 @@ public class EncryptionDecryptionFrame extends JFrame {
 		contentPane.add(sPane);
 		btnGenerateKeys.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if(textAreaForKey.getText().isEmpty() & textFieldKeyPath.getText().isEmpty()) {
+					if(textAreaForKey.getText().isEmpty())
+					JOptionPane.showMessageDialog(new JFrame(), "empty key, please enter a valid key!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+				//cancel the method
+					return;
+				}
+				if (!((encryptionRadioButton.isSelected()||decryptionRadioButton.isSelected())&(aesRadioButton.isSelected()||blowfishRadioButton.isSelected()||ideaRadioButton.isSelected())&
+						fileInputRadioButton.isSelected()||textInputRadioButton.isSelected())) {
+					JOptionPane.showMessageDialog(new JFrame(), "Please complete your options!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+				}
 				if (encryptionRadioButton.isSelected() & aesRadioButton.isSelected()
 						& textInputRadioButton.isSelected()) {
 					try {
@@ -427,8 +438,8 @@ public class EncryptionDecryptionFrame extends JFrame {
 					try {
 						choosingTextInputForBlowFishKey();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(new JFrame(), "Invalid key, please enter a valid key!", "Dialog",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				} else if (encryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
 						& fileInputRadioButton.isSelected()) {
@@ -459,23 +470,53 @@ public class EncryptionDecryptionFrame extends JFrame {
 		});
 		encryptButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if(textAreaForText.getText().isEmpty() & textFieldForText.getText().isEmpty()) {
+					if(textAreaForText.getText().isEmpty() &!(fileInputRadioButtonForText.isSelected()))
+					JOptionPane.showMessageDialog(new JFrame(), "empty text, please enter a valid text!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+					if(textFieldForText.getText().isEmpty()&!(textInputRadioButtonForText.isSelected()))
+						JOptionPane.showMessageDialog(new JFrame(), "please choose a valid file!", "Dialog",
+								JOptionPane.ERROR_MESSAGE);
+				//cancel the method
+					return;
+				}
+				if (!((encryptionRadioButton.isSelected()||decryptionRadioButton.isSelected())&(aesRadioButton.isSelected()||blowfishRadioButton.isSelected()||ideaRadioButton.isSelected())&
+						fileInputRadioButton.isSelected()||textInputRadioButton.isSelected())) {
+					JOptionPane.showMessageDialog(new JFrame(), "Please complete your options!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+				}
+				if(!(fileInputRadioButtonForText.isSelected()||textInputRadioButtonForText.isSelected())) {
+					JOptionPane.showMessageDialog(new JFrame(), "Please complete your options!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+				}
 				//AES
 				if (encryptionRadioButton.isSelected() & aesRadioButton.isSelected()
 						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
+					if (textInputRadioButton.isSelected()) {
+						try {
+							choosingTextInputForAesKey();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					if(textInputRadioButtonForText.isSelected())
 						try {
 							choosingTextInputForAesEncryption();
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					else if (fileInputRadioButtonForText.isSelected())
 						try {
 							choosingFileInputForAesEncryption();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							JOptionPane.showMessageDialog(new JFrame(), "Please choose a valid file!", "Dialog",
+									JOptionPane.ERROR_MESSAGE);
 						}
+					catch(StringIndexOutOfBoundsException e) {
+						JOptionPane.showMessageDialog(new JFrame(), "Please choose a valid file!", "Dialog",
+								JOptionPane.ERROR_MESSAGE);
+					}
 				}
 				//BlowFish
 				if (encryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
@@ -491,8 +532,8 @@ public class EncryptionDecryptionFrame extends JFrame {
 						try {
 							choosingFileInputForBlowfishEncryption();
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							JOptionPane.showMessageDialog(new JFrame(), "please choose a valid file!", "Dialog",
+									JOptionPane.ERROR_MESSAGE);
 						}
 				}
 				//Idea
@@ -521,6 +562,60 @@ public class EncryptionDecryptionFrame extends JFrame {
 					getDetails();
 				} catch (IOException e) {
 					e.printStackTrace();
+				}
+			}
+		});
+		decryptButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//BlowFish (done)
+				if (decryptionRadioButton.isSelected() & blowfishRadioButton.isSelected()
+						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
+					if(textInputRadioButtonForText.isSelected())
+						try {
+							choosingTextInputForBlowfishDecryption();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForBlowfishDecryption();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				}
+				//aes (done)
+				if (decryptionRadioButton.isSelected() & aesRadioButton.isSelected()
+						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
+					if(textInputRadioButtonForText.isSelected())
+						try {
+							choosingTextInputForAesDecryption();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForAesDecryption();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+				}
+				//Idea (done)
+				if (decryptionRadioButton.isSelected() & ideaRadioButton.isSelected()
+						& (textInputRadioButton.isSelected()||fileInputRadioButton.isSelected())& (textInputRadioButtonForText.isSelected()||fileInputRadioButtonForText.isSelected())) {
+					if(textInputRadioButtonForText.isSelected())
+						try {
+							choosingTextInputForIdeaDecryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					else if (fileInputRadioButtonForText.isSelected())
+						try {
+							choosingFileInputForIdeaDecryption();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 				}
 			}
 		});
@@ -630,131 +725,102 @@ public static void getDetails() throws IOException {
 	textAreaResults.setText(details);
 	IOutils.writeAfile("D:\\details.txt", details);
 }
-public static  void choosingFileInputForIdeaEncryption() throws IOException {
-	String text=IOutils.readAfile(textFieldForText.getText());
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=textAreaForKey.getText();
-		String resultingCipher=IDEA.encrypt(text, key);
-		textAreaResults.setText(resultingCipher);
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file
-		key=IOutils.readAfile(textFieldKeyPath.getText());
-		String resultingCipher=IDEA.encrypt(text, key);
-		textAreaResults.setText(resultingCipher);
-	}
-	}
 
-public static void choosingTextInputForIdeaEncryption() throws IOException {
-	String text=textAreaForText.getText();
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=textAreaForKey.getText();
-		String resultingCipher=IDEA.encrypt(text, key);
-		textAreaResults.setText(resultingCipher);
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file
-		key=IOutils.readAfile(textFieldKeyPath.getText());
-		String resultingCipher=IDEA.encrypt(text, key);
-		textAreaResults.setText(resultingCipher);
-	}
-	}
 
-public static void choosingFileInputForBlowfishEncryption() throws IOException {
-	String text=IOutils.readAfile(textFieldForText.getText());
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=textAreaForKey.getText();
-		String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
-		textAreaResults.setText(resultingCipher);
-		IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
-	
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file
-		key=IOutils.readAfile(textFieldKeyPath.getText());
-		String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
-		textAreaResults.setText(resultingCipher);
-		IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
-	}
-	}
+	//BlowFish Encryption And Decryption
+	//Encryption
+	public static void choosingFileInputForBlowfishEncryption() throws IOException {
+		String text=IOutils.readAfile(textFieldForText.getText());
+		String key="";
+		if (textInputRadioButton.isSelected()) {
+			key=textAreaForKey.getText();
+			String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
+		
+		}
+		else if (fileInputRadioButton.isSelected()) {
+			//get the content of original key file
+			key=IOutils.readAfile(textFieldKeyPath.getText());
+			String resultingCipher=BlowFishEnc.encryptBlowfish(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\blowfishCipher.txt", resultingCipher);
+		}
+		}
 
-public static void choosingTextInputForBlowfishEncryption() throws IOException {
-	String e= BlowFishEnc.encryptBlowfish(textAreaForText.getText(), textAreaForKey.getText());
-	//writing
-	IOutils.writeAfile("D:\\blowfishCipher.txt", e);
-	//reading
-	String result=IOutils.readAfile("D:\\blowfishCipher.txt");
-	textAreaResults.setText(result);
-	}
-
-public static void choosingTextInputForAesEncryption() throws IOException {
-	String text=textAreaForText.getText();
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=Convert.toHexadecimal(textAreaForKey.getText());
-		String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
-		textAreaResults.setText(resultingCipher);
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file and convert it to hexadecimal
-		key=Convert.toHexadecimal(IOutils.readAfile(textFieldKeyPath.getText()));
-		String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
-		textAreaResults.setText(resultingCipher);
-	}
-}
-public static void choosingFileInputForAesEncryption() throws IOException {
-	String text=IOutils.readAfile(textFieldForText.getText());
-	String key="";
-	if (textInputRadioButton.isSelected()) {
-		key=Convert.toHexadecimal(textAreaForKey.getText());
-		String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
-		textAreaResults.setText(resultingCipher);
-	}
-	else if (fileInputRadioButton.isSelected()) {
-		//get the content of original key file and convert it to hexadecimal
-		key=Convert.toHexadecimal(IOutils.readAfile(textFieldKeyPath.getText()));
-		String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
-		textAreaResults.setText(resultingCipher);
-	}
-}
-	public static void choosingTextInputForAesKey() throws IOException {
-		textAreaResults.setText(AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));
-		IOutils.writeAfile("D:\\aesKeys.txt", AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));
-	}
-
-	public static void choosingFileInputForAesKey() throws IOException {
-		// The name of the file to open.
-		String fileName = textFieldKeyPath.getText();
-		String key = IOutils.readAfile(fileName);
-		textAreaResults.setText(AES.getAesKeys(Convert.toHexadecimal(key)));
-		IOutils.writeAfile("D:\\aesKeys.txt",AES.getAesKeys(Convert.toHexadecimal(key)));
-	}
-
-	
+	public static void choosingTextInputForBlowfishEncryption() throws IOException {
+		String e= BlowFishEnc.encryptBlowfish(textAreaForText.getText(), textAreaForKey.getText());
+		//writing
+		IOutils.writeAfile("D:\\blowfishCipher.txt", e);
+		//reading
+		String result=IOutils.readAfile("D:\\blowfishCipher.txt");
+		textAreaResults.setText(result);
+		}
 	public static void choosingTextInputForBlowFishKey() throws IOException {
+		try {
 		BlowFishEnc blowFishEnc = new BlowFishEnc();
 		String string = textAreaForKey.getText();
 		textAreaResults.setText(blowFishEnc.getKey(string));
-		IOutils.writeAfile("D:\\blowfishKey.txt", blowFishEnc.getKey(string));
+		IOutils.writeAfile("D:\\blowfishKey.txt", blowFishEnc.getKey(string));}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(new JFrame(), "Invalid key, please enter a valid key!", "Dialog",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public static void choosingFileInputForBlowFishKey() throws IOException {
+		try {
 		BlowFishEnc blowFishEnc = new BlowFishEnc();
 		String fileName = textFieldKeyPath.getText();
 		String key = IOutils.readAfile(fileName);
 		textAreaResults.setText(blowFishEnc.getKey(key));
-		IOutils.writeAfile("D:\\blowfishkey.txt", blowFishEnc.getKey(key));
+		IOutils.writeAfile("D:\\blowfishkey.txt", blowFishEnc.getKey(key));}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(new JFrame(), "Please choose a valid file!", "Dialog",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
+	//Decryption
+	public static void choosingFileInputForBlowfishDecryption() throws IOException {
+		String text=IOutils.readAfile(textFieldForText.getText());
+		String key="";
+		if (textInputRadioButton.isSelected()) {
+			key=textAreaForKey.getText();
+			String resultingCipher=BlowFishEnc.decryptBlowfish(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\blowfishOriginalText.txt", resultingCipher);
+		}
+		else if (fileInputRadioButton.isSelected()) {
+			//get the content of original key file
+			key=IOutils.readAfile(textFieldKeyPath.getText());
+			String resultingCipher=BlowFishEnc.decryptBlowfish(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\blowfishOriginalText.txt", resultingCipher);
+		}
+		}
 
+	public static void choosingTextInputForBlowfishDecryption() throws IOException {
+		String e= BlowFishEnc.decryptBlowfish(textAreaForText.getText(), textAreaForKey.getText());
+		//writing
+		IOutils.writeAfile("D:\\blowfishOriginalText.txt", e);
+		//reading
+		String result=IOutils.readAfile("D:\\blowfishOriginalText.txt");
+		textAreaResults.setText(result);
+		}
+	//end of BlowFish Encryption And Decryption
+	//Idea Encryption And Decryption
+		//Encryption
 	public static void choosingFileInputForIdeaKey() throws IOException {
+		try {
 		String fileName = textFieldKeyPath.getText();
 		String key = IOutils.readAfile(fileName);
 		Key k = new Key(key);
 		textAreaResults.setText(k.getEncKeys());
-		IOutils.writeAfile("D:\\ideaKeys.txt", k.getEncKeys());
+		IOutils.writeAfile("D:\\ideaKeys.txt", k.getEncKeys());}
+		catch(FileNotFoundException e) {
+			JOptionPane.showMessageDialog(new JFrame(), "Please choose a valid file!", "Dialog",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public static void choosingTextInputForIdeaKey() throws IOException {
@@ -765,6 +831,161 @@ public static void choosingFileInputForAesEncryption() throws IOException {
 		textAreaResults.setText(keys);
 		IOutils.writeAfile("D:\\ideaKeys.txt", keys);
 	}
+	public static  void choosingFileInputForIdeaEncryption() throws IOException {
+		String text=IOutils.readAfile(textFieldForText.getText());
+		String key="";
+		if (textInputRadioButton.isSelected()) {
+			key=textAreaForKey.getText();
+			String resultingCipher=IDEA.encrypt(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\ideaCipher", resultingCipher);
+		}
+		else if (fileInputRadioButton.isSelected()) {
+			//get the content of original key file
+			key=IOutils.readAfile(textFieldKeyPath.getText());
+			String resultingCipher=IDEA.encrypt(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\ideaCipher", resultingCipher);
+		}
+		}
+
+	public static void choosingTextInputForIdeaEncryption() throws IOException {
+		String text=textAreaForText.getText();
+		String key="";
+		if (textInputRadioButton.isSelected()) {
+			key=textAreaForKey.getText();
+			String resultingCipher=IDEA.encrypt(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\ideaCipher.txt", resultingCipher);
+		}
+		else if (fileInputRadioButton.isSelected()) {
+			//get the content of original key file
+			key=IOutils.readAfile(textFieldKeyPath.getText());
+			String resultingCipher=IDEA.encrypt(text, key);
+			textAreaResults.setText(resultingCipher);
+			IOutils.writeAfile("D:\\ideaCipher.txt", resultingCipher);
+		}
+		}
+		//Decryption
+		public static void choosingFileInputForIdeaDecryption() throws IOException {
+			String text=IOutils.readAfile(textFieldForText.getText());
+			String key="";
+			if (textInputRadioButton.isSelected()) {
+				key=textAreaForKey.getText();
+				String resultingCipher=IDEA.decrypt(text, key);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\ideaOriginalText.txt", resultingCipher);
+			}
+			else if (fileInputRadioButton.isSelected()) {
+				//get the content of original key file
+				key=IOutils.readAfile(textFieldKeyPath.getText());
+				String resultingCipher=IDEA.decrypt(text, key);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\ideaOriginalText.txt", resultingCipher);
+			}
+			}
+
+		public static void choosingTextInputForIdeaDecryption() throws IOException {
+			String e= IDEA.decrypt(textAreaForText.getText(), textAreaForKey.getText());
+			//writing
+			IOutils.writeAfile("D:\\ideaOriginalText.txt", e);
+			//reading
+			String result=IOutils.readAfile("D:\\ideaOriginalText.txt");
+			textAreaResults.setText(result);
+			}
+		//end of Idea Encryption And Decryption
+		//aes encryption and decryption
+		//encryption
+		public static void choosingTextInputForAesEncryption() throws IOException {
+			String text=textAreaForText.getText();
+			String key="";
+			if (textInputRadioButton.isSelected()) {
+				key=Convert.toHexadecimal(textAreaForKey.getText());
+				String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
+				textAreaResults.setText(resultingCipher);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\aesCipher.txt", resultingCipher);
+			}
+			else if (fileInputRadioButton.isSelected()) {
+				//get the content of original key file and convert it to hexadecimal
+				key=Convert.toHexadecimal(IOutils.readAfile(textFieldKeyPath.getText()));
+				String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
+				textAreaResults.setText(resultingCipher);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\aesCipher.txt", resultingCipher);
+			}
+		}
+		public static void choosingFileInputForAesEncryption() throws IOException {
+			String text=IOutils.readAfile(textFieldForText.getText());
+			String key="";
+			if (textInputRadioButton.isSelected()) {
+				key=Convert.toHexadecimal(textAreaForKey.getText());
+				String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
+				System.out.println(resultingCipher);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\aesCipher.txt", resultingCipher);
+			}
+			else if (fileInputRadioButton.isSelected()) {
+				//get the content of original key file and convert it to hexadecimal
+				key=Convert.toHexadecimal(IOutils.readAfile(textFieldKeyPath.getText()));
+				String resultingCipher=new AES().encrypt(Convert.toHexadecimal(text), key);
+				System.out.println(resultingCipher);
+				textAreaResults.setText(resultingCipher);
+				IOutils.writeAfile("D:\\aesCipher.txt", resultingCipher);
+			}
+		}
+			public static void choosingTextInputForAesKey() throws IOException {
+				try {
+				textAreaResults.setText(AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));
+				IOutils.writeAfile("D:\\aesKeys.txt", AES.getAesKeys(Convert.toHexadecimal(textAreaForKey.getText())));}
+				catch(ArithmeticException e) {
+				e.printStackTrace();
+				}
+				catch(ArrayIndexOutOfBoundsException e) {
+				e.printStackTrace();
+				}
+			}
+
+			public static void choosingFileInputForAesKey() throws IOException {
+				try {
+				// The name of the file to open.
+				String fileName = textFieldKeyPath.getText();
+				String key = IOutils.readAfile(fileName);
+				textAreaResults.setText(AES.getAesKeys(Convert.toHexadecimal(key)));
+				IOutils.writeAfile("D:\\aesKeys.txt",AES.getAesKeys(Convert.toHexadecimal(key)));}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(new JFrame(), "Please choose a valid file!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			//decryption
+			public static void choosingFileInputForAesDecryption() throws IOException {
+				String text=IOutils.readAfile(textFieldForText.getText());
+				String key="";
+				if (textInputRadioButton.isSelected()) {
+					key=textAreaForKey.getText();
+					String resultingCipher=AES.decrypt(text, key);
+					textAreaResults.setText(resultingCipher);
+					IOutils.writeAfile("D:\\aesOriginalText.txt", resultingCipher);
+				}
+				else if (fileInputRadioButton.isSelected()) {
+					//get the content of original key file
+					key=IOutils.readAfile(textFieldKeyPath.getText());
+					String resultingCipher=AES.decrypt(text, key);
+					textAreaResults.setText(resultingCipher);
+					IOutils.writeAfile("D:\\aesOriginalText.txt", resultingCipher);
+				}
+				}
+
+			public static void choosingTextInputForAesDecryption() throws IOException {
+				String e= AES.decrypt(textAreaForText.getText(), textAreaForKey.getText());
+				//writing
+				IOutils.writeAfile("D:\\aesOriginalText.txt", e);
+				//reading
+				String result=IOutils.readAfile("D:\\aesOriginalText.txt");
+				textAreaResults.setText(result);
+				}
+			//end of aes encryption and decryption
 	public void close() {
 		this.dispose();
 	}

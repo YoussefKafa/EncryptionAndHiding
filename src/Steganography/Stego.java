@@ -25,6 +25,7 @@ and stores the modified image in <imFnm>Msg.png.
 	{
 	// read in the message, readTextFile reads the file and return the content as a string
 	String inputText = readTextFile(textFnm);
+	System.out.println(inputText);
 	// if there is no content , it return false and exit
 	if ((inputText == null) || (inputText.length() == 0))
 	return false;
@@ -260,7 +261,7 @@ because it's a WriteableRaster.
 			return msg;
 			} // end of getMessage()
 	public static void main (String args[]) throws IOException {
-	//hide("D:\\message.txt", "D:\\cover.png");
-	reveal("D:\\steg.png");
+	hide("D:\\key.txt", "D:\\cover.png");
+	//reveal("D:\\steg.png");
 	}
 }

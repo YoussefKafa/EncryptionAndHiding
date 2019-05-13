@@ -5,7 +5,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class BlowFishEnc {
 	public String getKey(String strkey) {
 		//create a key
-		SecretKeySpec key = new SecretKeySpec(strkey.getBytes(), "Blowfish");
+		SecretKeySpec  key = new SecretKeySpec(strkey.getBytes(), "Blowfish");
 		 /* Get key in encoding format */
 		  byte encoded[] = key.getEncoded();
 
@@ -42,14 +42,5 @@ public class BlowFishEnc {
 		  } catch (Exception e) { return null; }
 		}
   public static void main(String[] args) throws Exception {
-	/*String e= BlowFishEnc.encryptBlowfish("textToEncrypt", "anyKey");
-	//writing
-	IOutils.writeAfile("D:\\output.txt", e);
-	//reading
-	String result=IOutils.readAfile("D:\\output.txt");
-	System.out.println("result: "+result);
-	String ee=BlowFishEnc.decryptBlowfish(result, "anyKey");
-	System.out.println(ee);*/
-	
   }
 }

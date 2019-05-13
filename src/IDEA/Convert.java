@@ -5,6 +5,16 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.bind.DatatypeConverter;
 
 public class Convert {
+	public static String unHex(String arg) {
+	    String str = "";
+	    for(int i=0;i<arg.length();i+=2)
+	    {
+	        String s = arg.substring(i, (i + 2));
+	        int decimal = Integer.parseInt(s, 16);
+	        str = str + (char) decimal;
+	    }       
+	    return str;
+	}
     public static Binary[] stringToBinary(String text){
         int n = text.length();
         Binary [] result = new Binary[n];

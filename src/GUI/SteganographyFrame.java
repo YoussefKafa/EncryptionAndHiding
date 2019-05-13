@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
+
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,6 +25,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import IO.FilterTheFiles;
+import IO.IOutils;
+import Steganography.Stego;
 public class SteganographyFrame extends JFrame {
 	/**
 	 * 
@@ -73,16 +77,19 @@ public class SteganographyFrame extends JFrame {
 		btnStegFile.setToolTipText(stegFileTT);
 		btnStegFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String[] textFiles = new String[] { ".png" };
 				JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(fcCurDir);
-				fc.setDialogTitle("Choose a Steg Image");
+				fc.setDialogTitle("Choose a file : ");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				fc.setFileFilter(new FilterTheFiles("PNG Files", new String[] { ".png" }));
+				fc.setFileFilter(new FilterTheFiles("images Files", textFiles));
 				if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-					// somthing to do
+					tfStegFile.setText(fc.getSelectedFile().getAbsolutePath());
+				} else {
+					JOptionPane.showMessageDialog(new JFrame(), "You have not choose a file!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
 				}
-				fcCurDir = fc.getCurrentDirectory();
-			}
+				fcCurDir = fc.getCurrentDirectory();}
 		});
 		btnStegFile.setBounds(685, 78, 89, 23);
 		btnStegFile.setVisible(false);
@@ -103,17 +110,19 @@ public class SteganographyFrame extends JFrame {
 		JButton btnTopImage = new JButton("Choose");
 		btnTopImage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String[] images = new String[] { ".png" };
+				String[] textFiles = new String[] { ".png" };
 				JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(fcCurDir);
-				fc.setDialogTitle("Choose an Image");
+				fc.setDialogTitle("Choose a file : ");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				fc.setFileFilter(new FilterTheFiles("Image Files", images));
+				fc.setFileFilter(new FilterTheFiles("images Files", textFiles));
 				if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-					// somthing todo
+					tfTopImage.setText(fc.getSelectedFile().getAbsolutePath());
+				} else {
+					JOptionPane.showMessageDialog(new JFrame(), "You have not choose a file!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
 				}
-				fcCurDir = fc.getCurrentDirectory();
-			}
+				fcCurDir = fc.getCurrentDirectory();}
 		});
 		btnTopImage.setBounds(685, 26, 89, 23);
 		btnTopImage.setToolTipText(topImageTT);
@@ -132,11 +141,11 @@ public class SteganographyFrame extends JFrame {
 		lblMessage.setBounds(224, 56, 63, 14);
 		lblMessage.setVisible(false);
 		contentPane.add(lblMessage);
-		JTextField bottomFileTextArea = new JTextField();
-		bottomFileTextArea.setBounds(297, 53, 378, 20);
-		bottomFileTextArea.setToolTipText(bottomFileTT);
-		contentPane.add(bottomFileTextArea);
-		bottomFileTextArea.setColumns(10);
+		JTextField tfBottomFile = new JTextField();
+		tfBottomFile.setBounds(297, 53, 378, 20);
+		tfBottomFile.setToolTipText(bottomFileTT);
+		contentPane.add(tfBottomFile);
+		tfBottomFile.setColumns(10);
 		JLabel bottomFileLbl = new JLabel("Bottom File:");
 		bottomFileLbl.setBounds(224, 56, 73, 14);
 		bottomFileLbl.setToolTipText(bottomFileTT);
@@ -144,12 +153,17 @@ public class SteganographyFrame extends JFrame {
 		JButton bottomFileChoose = new JButton("Choose");
 		bottomFileChoose.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				String[] textFiles = new String[] { ".txt" };
 				JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(fcCurDir);
-				fc.setDialogTitle("Choose your file");
+				fc.setDialogTitle("Choose a file : ");
 				fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				fc.setFileFilter(new FilterTheFiles("text Files", textFiles));
 				if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-					// somthing to do
+					tfBottomFile.setText(fc.getSelectedFile().getAbsolutePath());
+				} else {
+					JOptionPane.showMessageDialog(new JFrame(), "You have not choose a file!", "Dialog",
+							JOptionPane.ERROR_MESSAGE);
 				}
 				fcCurDir = fc.getCurrentDirectory();
 			}
@@ -179,7 +193,7 @@ public class SteganographyFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				bottomFileChoose.setVisible(false);
 				bottomFileLbl.setVisible(false);
-				bottomFileTextArea.setVisible(false);
+				tfBottomFile.setVisible(false);
 				lblMessage.setVisible(true);
 				scrollMsg.setVisible(true);
 				taMsg.setVisible(true);
@@ -198,7 +212,7 @@ public class SteganographyFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				bottomFileChoose.setVisible(true);
 				bottomFileLbl.setVisible(true);
-				bottomFileTextArea.setVisible(true);
+				tfBottomFile.setVisible(true);
 				lblMessage.setVisible(false);
 				scrollMsg.setVisible(false);
 				taMsg.setVisible(false);
@@ -221,7 +235,7 @@ public class SteganographyFrame extends JFrame {
 				tfStegFile.setVisible(true);
 				bottomFileChoose.setVisible(false);
 				bottomFileLbl.setVisible(false);
-				bottomFileTextArea.setVisible(false);
+				tfBottomFile.setVisible(false);
 				lblMessage.setVisible(false);
 				scrollMsg.setVisible(false);
 				taMsg.setVisible(false);
@@ -270,6 +284,24 @@ public class SteganographyFrame extends JFrame {
 			}
 		});
 		contentPane.add(btnReset);
+		btnDoIt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			if(rdbtnHideAFile.isSelected() || rdbtnHideAMessage.isSelected() ||rdbtnRevealFilemesssage.isSelected() ){
+		try {
+			if(rdbtnHideAFile.isSelected())
+			Stego.hide(tfBottomFile.getText(), tfTopImage.getText());
+			else if (rdbtnHideAMessage.isSelected()) {
+				IOutils.writeAfile("D:\\text.txt", taMsg.getText());
+				Stego.hide("D:\\text.txt", tfTopImage.getText());}
+				else if (rdbtnRevealFilemesssage.isSelected()) {
+				Stego.reveal(tfStegFile.getText());
+				}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			}
+			}
+		});
 	}
 
 	public void close() {

@@ -14,23 +14,21 @@ public class IOutils {
 	static PrintWriter writer;
 	public static void  writeAfile(String path,String toWrite) throws IOException {
 		OutputStream outputStream = new FileOutputStream(path);
-		Writer       writer       = new OutputStreamWriter(outputStream,
-		                                                   Charset.forName("UTF-8"));
+		Writer writer = new OutputStreamWriter(outputStream,Charset.forName("UTF-8"));
 		writer.write(toWrite);
 		writer.close();
 	}
 	public static String readAfile(String path) throws IOException {
 		String resString="";
 		InputStream inputStream = new FileInputStream(path);
-		Reader      reader      = new InputStreamReader(inputStream,
-		                                                Charset.forName("UTF-8"));
+		Reader reader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
 		int data = reader.read();
 		while(data != -1){
 		    char theChar = (char) data;
-		    data = reader.read();
+				data = reader.read();
 		   resString+=theChar;
 		}
-		reader.close();
+			reader.close();
 		return resString;
 	}
 }

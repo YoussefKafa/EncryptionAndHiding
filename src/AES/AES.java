@@ -1,13 +1,10 @@
 package AES;
-
 import java.io.BufferedReader;
-
 import java.io.FileReader;
-
 import java.io.FileWriter;
-
 import java.io.IOException;
-
+import java.io.UnsupportedEncodingException;
+import IDEA.Convert;
 public class AES {
 
 	/**
@@ -993,9 +990,7 @@ public class AES {
 		int keypoint = keycounter;
 
 		while (keypoint < (colsize / 4)) {
-
 			int temp = keypoint % keycounter;
-
 			if (temp == 0) {
 
 				for (k = 0; k < 4; k++) {
@@ -1134,31 +1129,44 @@ public class AES {
 	 * 
 	 */
 
-	public static String MatrixToString(int[][] m) // takes in a matrix and converts it into a line of 32 hex
+	public static String MatrixToString(int[][] m,int rows ,int columns) // takes in a matrix and converts it into a line of 32 hex
 													// characters.
-
 	{
-		// String h = Integer.toHexString(m[i][j]).toUpperCase();
-		String key = "";
-		for (int i = 0; i < m.length; i++) {
-
-			for (int j = 0; j < m[0].length; j++) {
-				String h = Integer.toHexString(m[i][j]).toUpperCase();
-				if (h.length() == 1) {
-
-					key += "0" + h;
-
-				} else {
-
-					key += h;
-
-				}
-
-			}
-			key += "\n";
-		}
+		String key="";
+		for(int i=0; i<rows; i++)
+	       {
+	           for(int j=0; j<columns; j++)
+	           {
+	        	   String h = Integer.toHexString(m[j][i]).toUpperCase();
+	        	   if (h.length() == 1) {
+						key += "0" + h;
+					} else {
+						key += h;
+					}
+	           }
+	       }
 		return key;
 	}
+	public static String keysMatrixToString(int[][] m,int rows ,int columns) // takes in a matrix and converts it into a line of 32 hex
+	// characters.
+{
+String key="";
+for(int i=0; i<rows; i++)
+{
+for(int j=0; j<columns; j++)
+{
+	
+String h = Integer.toHexString(m[j][i]).toUpperCase();
+if (h.length() == 1) {
+key += "0" + h;
+} else {
+key += h;
+}
+}
+key+="\n";
+}
+return key;
+}
 public String encrypt(String t,String k) {
 	AES aes = new AES();
 	String key = k;
@@ -1189,12 +1197,46 @@ public String encrypt(String t,String k) {
 	aes.subBytes(state); // implements the Sub-Bytes subroutine.
 	aes.shiftRows(state); // implements Shift-Rows subroutine.
 	aes.addRoundKey(state, aes.subKey(keymatrix, numRounds));
-	return AES.MatrixToString(state);
+	return AES.MatrixToString(state,state.length,state[0].length);
+}
+public static String decrypt(String t,String k) throws UnsupportedEncodingException {
+	AES aes = new AES();
+	String cipher=t;
+	String decKey=Convert.toHexadecimal(k);
+	int[][] deckeymatrix = aes.keySchedule(decKey);
+	int decnumRounds = 10 + (((decKey.length() * 4 - 128) / 32));
+int[][] stated = new int[4][4];
+for (int i = 0; i < stated.length; i++) // Parses line into a matrix
+{
+	for (int j = 0; j < stated[0].length; j++) {
+		stated[j][i] = Integer.parseInt(cipher.substring((8 * i) + (2 * j), (8 * i) + (2 * j + 2)), 16);
+	}
+}
+	aes.addRoundKey(stated, aes.subKey(deckeymatrix, decnumRounds));
+
+	for (int i = decnumRounds - 1; i > 0; i--) {
+
+		aes.invShiftRows(stated);
+
+		aes.invSubBytes(stated);
+
+		aes.addRoundKey(stated, aes.subKey(deckeymatrix, i));
+
+		aes.invMixColumns(stated);
+
+	}
+
+	aes.invShiftRows(stated);
+
+	aes.invSubBytes(stated);
+
+	aes.addRoundKey(stated, aes.subKey(deckeymatrix, 0));
+	return(Convert.unHex(AES.MatrixToString(stated,4,4)));
 }
 public static String getAesKeys(String k) {
 	AES aes = new AES();
 	String key = k;
 	int[][] keymatrix = aes.keySchedule(key);
-	return AES.MatrixToString(keymatrix);
+	return AES.keysMatrixToString(keymatrix,keymatrix[0].length,keymatrix.length);
 }
 }
